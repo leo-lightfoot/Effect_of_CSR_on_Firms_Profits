@@ -1,0 +1,110 @@
+================================================================================
+FINANCIAL STATEMENT ANALYSIS RESULTS
+================================================================================
+
+1. OLS REGRESSION (Baseline)
+--------------------------------------------------------------------------------
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    ROA   R-squared:                       0.143
+Model:                            OLS   Adj. R-squared:                  0.143
+Method:                 Least Squares   F-statistic:                     1301.
+Date:                Fri, 02 Jan 2026   Prob (F-statistic):               0.00
+Time:                        22:54:40   Log-Likelihood:                -67051.
+No. Observations:               31168   AIC:                         1.341e+05
+Df Residuals:                   31163   BIC:                         1.342e+05
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+==================================================================================
+                     coef    std err          t      P>|t|      [0.025      0.975]
+----------------------------------------------------------------------------------
+const             -1.3518      0.070    -19.396      0.000      -1.488      -1.215
+leverage        9.768e-06   5.48e-05      0.178      0.858   -9.76e-05       0.000
+market_to_book    -5.9146      0.087    -68.289      0.000      -6.084      -5.745
+log_assets         0.1148      0.006     18.724      0.000       0.103       0.127
+csr_indicator     -0.2872      0.036     -7.888      0.000      -0.359      -0.216
+==============================================================================
+Omnibus:                   133532.961   Durbin-Watson:                   1.815
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):     483164306099.967
+Skew:                        -127.475   Prob(JB):                         0.00
+Kurtosis:                   19289.820   Cond. No.                     1.59e+03
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 1.59e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.
+
+2. FIXED EFFECTS REGRESSION (Original Data)
+--------------------------------------------------------------------------------
+                          PanelOLS Estimation Summary                           
+================================================================================
+Dep. Variable:                    ROA   R-squared:                        0.1566
+Estimator:                   PanelOLS   R-squared (Between):             -39.211
+No. Observations:               31168   R-squared (Within):               0.1543
+Date:                Fri, Jan 02 2026   R-squared (Overall):             -13.241
+Time:                        22:54:36   Log-likelihood                -6.254e+04
+Cov. Estimator:             Clustered                                           
+                                        F-statistic:                      1286.6
+Entities:                        3430   P-value                           0.0000
+Avg Obs:                       9.0869   Distribution:                 F(4,27725)
+Min Obs:                       1.0000                                           
+Max Obs:                      10.0000   F-statistic (robust):             74.113
+                                        P-value                           0.0000
+Time periods:                      10   Distribution:                 F(4,27725)
+Avg Obs:                       3116.8                                           
+Min Obs:                       2672.0                                           
+Max Obs:                       3355.0                                           
+                                                                                
+                               Parameter Estimates                                
+==================================================================================
+                Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+----------------------------------------------------------------------------------
+leverage        9.221e-06  9.041e-06     1.0199     0.3078    -8.5e-06   2.694e-05
+market_to_book    -5.7206     0.3564    -16.050     0.0000     -6.4192     -5.0219
+log_assets         0.6708     0.2388     2.8091     0.0050      0.2027      1.1388
+csr_indicator     -0.1419     0.0468    -3.0327     0.0024     -0.2337     -0.0502
+==================================================================================
+
+F-test for Poolability: 2.7082
+P-value: 0.0000
+Distribution: F(3438,27725)
+
+Included effects: Entity, Time
+
+3. FIXED EFFECTS REGRESSION (Winsorized Data)
+--------------------------------------------------------------------------------
+                          PanelOLS Estimation Summary                           
+================================================================================
+Dep. Variable:                    ROA   R-squared:                        0.1298
+Estimator:                   PanelOLS   R-squared (Between):             -35.995
+No. Observations:               31168   R-squared (Within):               0.1205
+Date:                Fri, Jan 02 2026   R-squared (Overall):             -29.515
+Time:                        22:54:37   Log-likelihood                 2.615e+04
+Cov. Estimator:             Clustered                                           
+                                        F-statistic:                      1033.7
+Entities:                        3430   P-value                           0.0000
+Avg Obs:                       9.0869   Distribution:                 F(4,27725)
+Min Obs:                       1.0000                                           
+Max Obs:                      10.0000   F-statistic (robust):             101.15
+                                        P-value                           0.0000
+Time periods:                      10   Distribution:                 F(4,27725)
+Avg Obs:                       3116.8                                           
+Min Obs:                       2672.0                                           
+Max Obs:                       3355.0                                           
+                                                                                
+                               Parameter Estimates                                
+==================================================================================
+                Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+----------------------------------------------------------------------------------
+leverage           0.0041     0.0004     9.6688     0.0000      0.0033      0.0049
+market_to_book    -1.6172     1.9026    -0.8500     0.3953     -5.3465      2.1120
+log_assets         0.0927     0.0052     17.955     0.0000      0.0826      0.1029
+csr_indicator     -0.0257     0.0033    -7.8414     0.0000     -0.0322     -0.0193
+==================================================================================
+
+F-test for Poolability: 17.864
+P-value: 0.0000
+Distribution: F(3438,27725)
+
+Included effects: Entity, Time
