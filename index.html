@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSR Disclosure Impact Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --accent: #0ea5e9;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Header */
+        header {
+            background: var(--card-bg);
+            padding: 2rem 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        header h2 {
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .authors {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--card-bg);
+            padding: 0.75rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .card h3 {
+            color: var(--text);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Key Finding Box */
+        .key-finding {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .key-finding h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .key-finding .stat {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            font-size: 0.875rem;
+        }
+
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        tbody tr:hover {
+            background: var(--bg);
+        }
+
+        /* Responsive table */
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: var(--success); color: white; }
+        .badge-warning { background: var(--warning); color: white; }
+        .badge-danger { background: var(--danger); color: white; }
+        .badge-info { background: var(--primary); color: white; }
+
+        /* Highlight boxes */
+        .highlight {
+            background: #fef3c7;
+            border-left: 3px solid var(--warning);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 3px solid var(--primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        /* Stats cards */
+        .stat-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .stat-card .label {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            header h2 {
+                font-size: 0.875rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .card h2 {
+                font-size: 1.25rem;
+            }
+
+            .card h3 {
+                font-size: 1rem;
+            }
+
+            nav {
+                position: relative;
+                top: 0;
+            }
+
+            nav ul {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .key-finding .stat {
+                font-size: 1.5rem;
+            }
+
+            .stat-card .number {
+                font-size: 1.5rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        section {
+            scroll-margin-top: 80px;
+        }
+
+        .significance {
+            font-weight: bold;
+            color: var(--danger);
+        }
+
+        /* Simplified content */
+        p {
+            margin: 0.75rem 0;
+            font-size: 0.9rem;
+        }
+
+        strong {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>The Effect of Mandatory CSR Disclosure on Corporate Profitability</h1>
+            <h2>EU Directive 2014/95/EU - Panel Data Analysis</h2>
+        </header>
+
+        <!-- Navigation -->
+        <nav>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#descriptive">Data</a></li>
+                <li><a href="#results">Results</a></li>
+                <li><a href="#findings">Findings</a></li>
+                <li><a href="#implications">Implications</a></li>
+                <li><a href="#limitations">Limitations</a></li>
+            </ul>
+        </nav>
+
+        <!-- Executive Summary -->
+        <section id="overview" class="card">
+            <h2>Executive Summary</h2>
+
+            <div class="key-finding">
+                <h3>Main Finding</h3>
+                <div class="stat">-0.1419</div>
+                <p>CSR disclosure reduces ROA by 0.14 units (p = 0.0024)</p>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="stat-card">
+                    <div class="number">31,168</div>
+                    <div class="label">Observations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">3,430</div>
+                    <div class="label">Firms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">10</div>
+                    <div class="label">Years (2012-2021)</div>
+                </div>
+            </div>
+
+            <h3>Research Question</h3>
+            <p>Does mandatory CSR disclosure impact firm profitability (measured by ROA)?</p>
+
+            <div class="grid grid-2">
+                <div class="info-box">
+                    <strong>Positive Theory:</strong> Enhanced reputation and stakeholder trust improve profitability
+                </div>
+                <div class="highlight">
+                    <strong>Cost-Based Theory (Supported):</strong> Compliance costs reduce short-term profitability
+                </div>
+            </div>
+        </section>
+
+        <!-- Methodology -->
+        <section id="methodology" class="card">
+            <h2>Methodology</h2>
+
+            <h3>Data</h3>
+            <p>Panel data of European firms from Refinitiv Eikon (2012-2021)</p>
+
+            <h3>Model</h3>
+            <div class="info-box">
+                <strong>ROA = CSR_Indicator + Leverage + Market_to_Book + Log_Assets + Firm_FE + Year_FE</strong>
+            </div>
+
+            <h3>Variables</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Definition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ROA</strong></td>
+                        <td>Operating Income / Total Assets</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CSR Indicator</strong></td>
+                        <td>1 if CSR reported, 0 otherwise</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Leverage</strong></td>
+                        <td>Total Assets / Total Liabilities</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Log Assets</strong></td>
+                        <td>ln(Total Assets)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Market-to-Book</strong></td>
+                        <td>Market Value / Total Assets</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Approach</h3>
+            <ul>
+                <li>Fixed Effects Regression (firm + year)</li>
+                <li>Clustered Standard Errors</li>
+                <li>Winsorization (1st and 99th percentiles)</li>
+            </ul>
+        </section>
+
+        <!-- Descriptive Statistics -->
+        <section id="descriptive" class="card">
+            <h2>Descriptive Statistics</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Mean</th>
+                        <th>Std. Dev.</th>
+                        <th>Min</th>
+                        <th>Max</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ROA</strong></td>
+                        <td>-0.053</td>
+                        <td>2.247</td>
+                        <td>-329.25</td>
+                        <td>10.70</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Leverage</strong></td>
+                        <td>9.150</td>
+                        <td>215.23</td>
+                        <td>-1,433</td>
+                        <td>26,914</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Log Assets</strong></td>
+                        <td>12.06</td>
+                        <td>2.53</td>
+                        <td>0</td>
+                        <td>20.06</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Market-to-Book</strong></td>
+                        <td>0.003</td>
+                        <td>0.136</td>
+                        <td>0</td>
+                        <td>23.4</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CSR Indicator</strong></td>
+                        <td>0.237</td>
+                        <td>0.426</td>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <strong>Key Insight:</strong> 23.7% of firms disclosed CSR reports. Larger firms are significantly more likely to disclose (correlation = 0.65).
+            </div>
+
+            <h3>Key Correlations</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variables</th>
+                        <th>Correlation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Log Assets ↔ CSR Indicator</td>
+                        <td><span class="badge badge-success">0.649</span></td>
+                    </tr>
+                    <tr>
+                        <td>Market-to-Book ↔ ROA</td>
+                        <td><span class="badge badge-danger">-0.364</span></td>
+                    </tr>
+                    <tr>
+                        <td>Log Assets ↔ ROA</td>
+                        <td><span class="badge badge-info">0.110</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Results -->
+        <section id="results" class="card">
+            <h2>Regression Results</h2>
+
+            <h3>Fixed Effects Model (Main Results)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Coefficient</th>
+                        <th>Std. Error</th>
+                        <th>p-value</th>
+                        <th>Sig</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: #fef3c7;">
+                        <td><strong>CSR Indicator</strong></td>
+                        <td class="significance">-0.1419</td>
+                        <td>0.0468</td>
+                        <td class="significance">0.0024</td>
+                        <td><span class="badge badge-danger">***</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Market-to-Book</strong></td>
+                        <td>-5.7206</td>
+                        <td>0.3564</td>
+                        <td>0.0000</td>
+                        <td><span class="badge badge-danger">***</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Log Assets</strong></td>
+                        <td>0.6708</td>
+                        <td>0.2388</td>
+                        <td>0.0050</td>
+                        <td><span class="badge badge-danger">***</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Leverage</strong></td>
+                        <td>0.000009</td>
+                        <td>0.000009</td>
+                        <td>0.308</td>
+                        <td>NS</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Model:</strong> R² = 0.154 | F = 74.11 (p < 0.001) | N = 31,168 | Firms = 3,430</p>
+
+            <h3>Model Comparison</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>CSR Coefficient</th>
+                        <th>p-value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>OLS</td>
+                        <td>-0.287</td>
+                        <td>0.000</td>
+                    </tr>
+                    <tr style="background: #fef3c7;">
+                        <td>Fixed Effects</td>
+                        <td>-0.142</td>
+                        <td>0.0024</td>
+                    </tr>
+                    <tr>
+                        <td>Winsorized FE</td>
+                        <td>-0.026</td>
+                        <td>0.000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <strong>Robustness:</strong> Negative effect is significant across all specifications
+            </div>
+        </section>
+
+        <!-- Findings -->
+        <section id="findings" class="card">
+            <h2>Key Findings</h2>
+
+            <div class="grid grid-2">
+                <div class="stat-card">
+                    <div class="label">CSR Impact</div>
+                    <div class="number" style="color: var(--danger);">-0.14</div>
+                    <div class="label">ROA Reduction</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Firm Size</div>
+                    <div class="number" style="color: var(--success);">+0.67</div>
+                    <div class="label">ROA Increase</div>
+                </div>
+            </div>
+
+            <h3>1. CSR Disclosure Reduces Profitability</h3>
+            <div class="highlight">
+                <p>CSR disclosure reduces ROA by <strong>0.14 units</strong> (p = 0.0024). This supports the cost-based theory: compliance costs outweigh short-term benefits.</p>
+            </div>
+
+            <h3>2. Larger Firms More Profitable</h3>
+            <p>Larger firms show higher profitability (+0.67 per unit of log assets) and are more likely to disclose CSR.</p>
+
+            <h3>3. Market Expectations vs. Reality</h3>
+            <p>High market-to-book firms have lower current ROA (-5.72), reflecting growth expectations.</p>
+
+            <h3>Why Negative?</h3>
+            <ul>
+                <li>Compliance and reporting costs</li>
+                <li>Administrative burden</li>
+                <li>Operational adjustments</li>
+                <li>Long-term benefits not yet visible</li>
+            </ul>
+        </section>
+
+        <!-- Implications -->
+        <section id="implications" class="card">
+            <h2>Implications</h2>
+
+            <h3>For Policymakers</h3>
+            <ul>
+                <li>CSR disclosure imposes measurable short-term costs</li>
+                <li>Consider phased implementation by firm size</li>
+                <li>Provide compliance support and resources</li>
+            </ul>
+
+            <h3>For Investors</h3>
+            <ul>
+                <li>CSR commitments ≠ immediate profitability</li>
+                <li>Focus on long-term value creation</li>
+                <li>Distinguish strategic CSR from compliance</li>
+            </ul>
+
+            <h3>For Firms</h3>
+            <ul>
+                <li>Integrate CSR into core strategy (not just compliance)</li>
+                <li>Optimize reporting processes</li>
+                <li>Accept short-term trade-offs for long-term gains</li>
+                <li>Communicate clearly with stakeholders</li>
+            </ul>
+        </section>
+
+        <!-- Limitations -->
+        <section id="limitations" class="card">
+            <h2>Limitations</h2>
+
+            <div class="grid grid-2">
+                <div>
+                    <h3>Reverse Causality</h3>
+                    <p>Profitable firms may be more likely to engage in CSR voluntarily.</p>
+                </div>
+                <div>
+                    <h3>Omitted Variables</h3>
+                    <p>Management quality and corporate culture not observed.</p>
+                </div>
+                <div>
+                    <h3>Measurement</h3>
+                    <p>CSR indicator is binary; doesn't capture quality or intensity.</p>
+                </div>
+                <div>
+                    <h3>Short-term Focus</h3>
+                    <p>Long-term benefits (reputation) not captured in current data.</p>
+                </div>
+            </div>
+
+            <h3>Future Research</h3>
+            <ul>
+                <li>Track long-term effects (5-10 years)</li>
+                <li>Analyze industry-specific patterns</li>
+                <li>Use continuous CSR quality measures</li>
+                <li>Study mechanism behind negative effect</li>
+            </ul>
+        </section>
+
+        <!-- Conclusions -->
+        <section class="card">
+            <h2>Conclusions</h2>
+
+            <div class="key-finding">
+                <p>Mandatory CSR disclosure imposes <strong>measurable short-term costs</strong> on firms. Strategic CSR integration, rather than pure compliance, offers the best path forward.</p>
+            </div>
+
+            <h3>Main Takeaways</h3>
+            <ol>
+                <li>CSR reduces short-term profitability (-0.14 ROA units, p = 0.0024)</li>
+                <li>Larger firms are more profitable and better positioned for CSR</li>
+                <li>Effect is robust across multiple model specifications</li>
+                <li>Policymakers must balance social responsibility with economic sustainability</li>
+            </ol>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p><strong>Group 4 - Financial Statement Analysis</strong></p>
+            <p>Abdul Malik • Douglas Mukasa • Chiraag Katara • Anirudh Nair • Adwait Kulkarni • Abhishek Phalke</p>
+            <p style="margin-top: 1rem;">31,168 observations | 3,430 firms | 2012-2021</p>
+        </footer>
+    </div>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Active nav highlighting
+        window.addEventListener('scroll', () => {
+            let current = '';
+            document.querySelectorAll('section').forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
