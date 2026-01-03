@@ -748,12 +748,20 @@
         // Smooth scroll
         document.querySelectorAll('nav a').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const href = this.getAttribute('href');
+                
+                // Only handle internal anchor links
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+                // External links (like GitHub) will work normally without preventDefault
             });
         });
-
+        
         // Active nav highlighting
         window.addEventListener('scroll', () => {
             let current = '';
@@ -763,7 +771,6 @@
                     current = section.getAttribute('id');
                 }
             });
-
             document.querySelectorAll('nav a').forEach(link => {
                 link.classList.remove('active');
                 if (link.getAttribute('href') === '#' + current) {
